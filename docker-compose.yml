@@ -1,0 +1,30 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-backend
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Uncomment the 'deploy' block below ONLY if you have an NVIDIA GPU:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  streamlit-ui:
+    build: .
+    container_name: streamlit-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434/v1
+      - MODEL_NAME=qwen2.5:1.5b
+    depends_on:
+      - ollama
+
+volumes:
+  ollama_data:
